@@ -27,7 +27,9 @@ Vagrant.configure(2) do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   config.vm.network "private_network", ip: "192.168.33.10"
-
+  config.vm.hostname = "bookmarker.local"
+  #config.hostsupdater.aliases = ["www.bookmarker.local"]
+  
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
@@ -38,7 +40,7 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   # config.vm.synced_folder "../data", "/vagrant_data"
-  config.vm.synced_folder ".", "/var/www/bookmarker.local/public"
+  config.vm.synced_folder ".", "/var/www/bookmarker.local/public", :owner => "www-data", :group => "www-data"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -66,6 +68,7 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
+    sudo locale-gen pt_BR.UTF-8
     sudo add-apt-repository ppa:ondrej/php
     sudo apt-get update
     sudo apt-get install -y nginx php7.0-fpm php7.0-mysql php-intl
@@ -75,6 +78,7 @@ Vagrant.configure(2) do |config|
     sudo apt-get -y install mysql-server mysql-client
     sudo curl -s https://getcomposer.org/installer | php
     sudo mv composer.phar /usr/local/bin/composer
+    cd /var/www/bookmarker.local/public
     sudo composer install
     sudo cp /var/www/bookmarker.local/public/config/nginx/bookmarker.local /etc/nginx/sites-available/bookmarker.local
     sudo mkdir -p /var/www/bookmarker.local/log
