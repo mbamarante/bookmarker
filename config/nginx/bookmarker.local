@@ -1,0 +1,26 @@
+server {
+    listen   80;
+    server_name bookmarker.local;
+    rewrite 301 http://bookmarker.local$request_uri permanent;
+
+    # root directive should be global
+    root   /var/www/bookmarker.local/public/webroot;
+    index  index.php;
+
+    access_log /var/www/bookmarker.local/log/access.log;
+    error_log /var/www/bookmarker.local/log/error.log;
+
+    location / {
+	try_files $uri /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        try_files 	$uri =404;
+        include 	fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+	#fastcgi_pass	127.0.0.1:9000;
+        fastcgi_index	index.php;
+        fastcgi_param	SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+}
