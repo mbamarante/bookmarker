@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
   config.vm.network "private_network", ip: "192.168.33.10"
   config.vm.hostname = "bookmarker.local"
   #config.hostsupdater.aliases = ["www.bookmarker.local"]
-  
+
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
@@ -71,7 +71,7 @@ Vagrant.configure(2) do |config|
     sudo locale-gen pt_BR.UTF-8
     sudo add-apt-repository ppa:ondrej/php
     sudo apt-get update
-    sudo apt-get install -y nginx php7.0-fpm php7.0-mysql php-intl
+    sudo apt-get install -y nginx php7.0-fpm php7.0-mysql php-intl php-sqlite3
     sudo apt-get install -y git
     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
     sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
@@ -83,6 +83,9 @@ Vagrant.configure(2) do |config|
     sudo mv composer.phar /usr/local/bin/composer
     cd /var/www/bookmarker.local/public
     sudo composer install
+    sudo chmod +x /var/www/bookmarker.local/public/bin/cake
+    sudo composer require --dev cakephp/debug_kit "~3.0"
+    sudo bin/cake plugin load DebugKit
     sudo cp /var/www/bookmarker.local/public/config/nginx/bookmarker.local /etc/nginx/sites-available/bookmarker.local
     sudo mkdir -p /var/www/bookmarker.local/log
     sudo ln -s /etc/nginx/sites-available/bookmarker.local /etc/nginx/sites-enabled/bookmarker.local
